@@ -104,7 +104,7 @@ class Customer
 
     public function getCompany(): ?string
     {
-        return $this->Company;
+        return $this->company;
     }
 
     public function setCompany(string $company): self
