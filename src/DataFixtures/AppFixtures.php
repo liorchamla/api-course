@@ -47,6 +47,6 @@ class AppFixtures extends Fixture
     private function getAvatar(?string $gender = 'female'): string
     {
         $gender = $gender === 'female' ? 'women' : 'men';
-        return "https: //randomuser.me/api/portraits/{$gender}/{mt_rand(1, 99)}.jpg";
+        return "https://randomuser.me/api/portraits/{$gender}/" . mt_rand(1, 99) . ".jpg";
     }
 }
