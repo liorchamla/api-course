@@ -6,11 +6,14 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\InvoiceRepository;
 use Doctrine\Common\Persistence\Event\LifecycleEventArgs;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\InvoiceRepository")
  * @ORM\HasLifecycleCallbacks
- * @ApiResource()
+ * @ApiResource(
+ *  normalizationContext={"groups"={"invoice_read"}}
+ * )
  */
 class Invoice
 {
@@ -24,41 +27,49 @@ class Invoice
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"invoice_read", "customer_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"invoice_read", "customer_read"})
      */
     private $chrono;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"invoice_read", "customer_read"})
      */
     private $sentAt;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"invoice_read", "customer_read"})
      */
     private $createdAt;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"invoice_read", "customer_read"})
      */
     private $updatedAt;
 
     /**
      * @ORM\Column(type="float")
+     * @Groups({"invoice_read", "customer_read"})
      */
     private $amount;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"invoice_read", "customer_read"})
      */
     private $status;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Customer", inversedBy="invoices")
+     * @Groups("invoice_read")
      */
     private $customer;
 

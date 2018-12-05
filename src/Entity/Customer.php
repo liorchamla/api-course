@@ -3,15 +3,17 @@
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CustomerRepository")
  * @ORM\HasLifecycleCallbacks
- * @ApiResource()
+ * @ApiResource(
+ *  normalizationContext={"groups"={"customer_read", "invoice_read"}}
+ * )
  */
 class Customer
 {
@@ -19,49 +21,83 @@ class Customer
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"customer_read", "invoice_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"customer_read", "invoice_read"})
      */
     private $firstName;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"customer_read", "invoice_read"})
      */
     private $lastName;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"customer_read", "invoice_read"})
      */
     private $avatar;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"customer_read"})
      */
     private $email;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"customer_read"})
      */
     private $company;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"customer_read"})
      */
     private $createdAt;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"customer_read"})
      */
     private $updatedAt;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Invoice", mappedBy="customer")
-     * @ApiSubresource()
      */
     private $invoices;
+
+    /**
+     * @Groups({"customer_read"})
+     *
+     * @return array
+     */
+    public function getTotalInvoiced(): array
+    {
+        $totals = [Invoice::STATUS_CANCELED => 0, Invoice::STATUS_SENT => 0, Invoice::STATUS_PAID => 0, 'global' => 0];
+
+        foreach ($this->invoices as $invoice) {
+            $totals[$invoice->getStatus()] += $invoice->getAmount();
+            $totals['global'] += $invoice->getAmount();
+        }
+
+        return $totals;
+    }
+
+    /**
+     * @Groups({"customer_read"})
+     *
+     * @return integer
+     */
+    public function getInvoicesCount(): int
+    {
+        return count($this->invoices);
+    }
 
     public function __construct()
     {
