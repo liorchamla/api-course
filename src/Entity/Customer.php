@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CustomerRepository")
@@ -28,24 +29,31 @@ class Customer
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"customer_read", "invoice_read"})
+     * @Assert\NotBlank(message="First name is mandatory !")
+     * @Assert\Length(min=3, max=255, minMessage="First name must have at least 3 characters", maxMessage="First name can not be more than 255 characters long")
      */
     private $firstName;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"customer_read", "invoice_read"})
+     * @Assert\NotBlank(message="Last name is mandatory !")
+     * @Assert\Length(min=3, max=255, minMessage="Last name must have at least 3 characters", maxMessage="First name can not be more than 255 characters long")
      */
     private $lastName;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"customer_read", "invoice_read"})
+     * @Assert\Url(message="Avatar must be a valid image URL")
      */
     private $avatar;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"customer_read"})
+     * @Assert\NotBlank(message="Email is mandatory")
+     * @Assert\Email(message="Email must be a valid email address")
      */
     private $email;
 

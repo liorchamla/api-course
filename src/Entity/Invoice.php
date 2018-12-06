@@ -7,6 +7,7 @@ use App\Repository\InvoiceRepository;
 use Doctrine\Common\Persistence\Event\LifecycleEventArgs;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\InvoiceRepository")
@@ -58,12 +59,15 @@ class Invoice
     /**
      * @ORM\Column(type="float")
      * @Groups({"invoice_read", "customer_read"})
+     * @Assert\NotBlank(message="The amount is mandatory")
+     * @Assert\Type("float", message="The amount must be a number !")
      */
     private $amount;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"invoice_read", "customer_read"})
+     * @Assert\Choice({"sent", "paid", "canceled"}, message="The status must be 'sent', 'paid' or 'canceled'")
      */
     private $status;
 
