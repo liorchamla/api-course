@@ -61,6 +61,7 @@ class Invoice
      * @Groups({"invoice_read", "customer_read"})
      * @Assert\NotBlank(message="The amount is mandatory")
      * @Assert\Type("float", message="The amount must be a number !")
+     * @Assert\Expression("this.getAmount() > 0", message="Amount must be a positive number !")
      */
     private $amount;
 
