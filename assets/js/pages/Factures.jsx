@@ -1,8 +1,42 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
+import ClientDisplay from "../components/ClientDisplay";
+
+import format from "./../services/formatter";
+import facturesService from "../services/facturesService";
+
+const FactureRow = ({ facture }) => {
+  return (
+    <tr>
+      <td>{facture.id}</td>
+      <td>
+        <Link to={`/factures/${facture.id}`}>{facture.chrono}</Link>
+      </td>
+      <td>
+        <ClientDisplay client={facture.customer} />
+      </td>
+      <td>{format.amount(facture.amount)}</td>
+      <td>{format.invoiceStatus(facture.status)}</td>
+      <td>{format.date(facture.sentAt)}</td>
+      <td>
+        <Link to={`/factures/${facture.id}`} className="btn btn-primary btn-sm">
+          Editer
+        </Link>
+      </td>
+    </tr>
+  );
+};
 
 class Factures extends Component {
-  state = {};
+  state = {
+    factures: []
+  };
+
+  async componentDidMount() {
+    const factures = await facturesService.all();
+    this.setState({ factures });
+  }
+
   render() {
     return (
       <>
@@ -20,21 +54,9 @@ class Factures extends Component {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>12</td>
-              <td>FA2018004</td>
-              <td>
-                <Link to="/clients/xxx">Lior Chamla</Link>
-              </td>
-              <td>2500,00&euro;</td>
-              <td>Payée</td>
-              <td>19/01/2018</td>
-              <td>
-                <Link to="/factures/xxx" className="btn btn-primary btn-sm">
-                  Editer
-                </Link>
-              </td>
-            </tr>
+            {this.state.factures.map(f => (
+              <FactureRow facture={f} key={f.id} />
+            ))}
           </tbody>
         </table>
       </>

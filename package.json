@@ -1,8 +1,10 @@
 {
     "devDependencies": {
         "@babel/plugin-proposal-class-properties": "^7.2.1",
+        "@babel/plugin-transform-regenerator": "^7.0.0",
         "@babel/preset-react": "^7.0.0",
         "@symfony/webpack-encore": "^0.22.0",
+        "babel-polyfill": "^6.26.0",
         "webpack-notifier": "^1.6.0"
     },
     "license": "UNLICENSED",
@@ -14,6 +16,8 @@
         "build": "encore production --progress"
     },
     "dependencies": {
+        "axios": "^0.18.0",
+        "moment": "^2.22.2",
         "react": "^16.6.3",
         "react-dom": "^16.6.3",
         "react-router-dom": "^4.3.1"

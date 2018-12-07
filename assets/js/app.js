@@ -5,6 +5,11 @@
  * (and its CSS file) in your base layout (base.html.twig).
  */
 
+/**
+ * Import nécessaire (+ le npm install pour faire de l'async / await)
+ */
+import "babel-polyfill";
+
 import React from "react";
 import ReactDOM from "react-dom";
 

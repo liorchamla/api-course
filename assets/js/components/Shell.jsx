@@ -7,7 +7,6 @@ import Clients from "./../pages/Clients";
 import Factures from "./../pages/Factures";
 
 class Shell extends Component {
-  state = {};
   render() {
     return (
       <HashRouter>
