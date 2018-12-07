@@ -10,29 +10,9 @@ import ReactDOM from "react-dom";
 
 // any CSS you require will output into a single css file (app.css in this case)
 import "../css/app.css";
+import Shell from "./components/Shell";
 
 // Need jQuery? Install it with "yarn add jquery", then uncomment to require it.
 // var $ = require('jquery');
 
-class App extends React.Component {
-  state = {
-    clicked: false
-  };
-
-  switchClick() {
-    this.setState({ clicked: !this.state.clicked });
-  }
-
-  render() {
-    return (
-      <div className="container">
-        <h1>Hello World !</h1>
-        <button onClick={this.switchClick.bind(this)}>
-          Clicked: {this.state.clicked ? "Yes" : "No"}
-        </button>
-      </div>
-    );
-  }
-}
-
-ReactDOM.render(<App />, document.querySelector("#app"));
+ReactDOM.render(<Shell />, document.querySelector("#app"));
