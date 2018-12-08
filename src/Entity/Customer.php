@@ -83,6 +83,16 @@ class Customer
     /**
      * @Groups({"customer_read"})
      *
+     * @return string
+     */
+    public function getFullName(): string
+    {
+        return "{$this->firstName} {$this->lastName}";
+    }
+
+    /**
+     * @Groups({"customer_read"})
+     *
      * @return array
      */
     public function getTotalInvoiced(): array

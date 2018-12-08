@@ -4,6 +4,9 @@ import ClientDisplay from "../components/ClientDisplay";
 
 import format from "./../services/formatter";
 import facturesService from "../services/facturesService";
+import Pagination from "./../components/Pagination";
+import Search from "../components/Search";
+import configuration from "./../config";
 
 const FactureRow = ({ facture }) => {
   return (
@@ -29,18 +32,55 @@ const FactureRow = ({ facture }) => {
 
 class Factures extends Component {
   state = {
-    factures: []
+    invoices: [],
+    currentPage: 1,
+    itemsPerPage: 5,
+    filter: "",
+    loading: false
   };
 
   async componentDidMount() {
-    const factures = await facturesService.all();
-    this.setState({ factures });
+    const invoices = await facturesService.all();
+    const itemsPerPage = configuration.itemsPerPage;
+    this.setState({ invoices, loading: false, itemsPerPage });
   }
 
+  handlePaginationChange = page => {
+    this.setState({ currentPage: page });
+  };
+
+  handleSearch = ({ currentTarget: input }) => {
+    this.setState({ currentPage: 1, filter: input.value.toLowerCase() });
+  };
+
+  filter = () => {
+    const { filter, invoices } = this.state;
+
+    return invoices.filter(
+      f =>
+        f.customer.firstName.toLowerCase().includes(filter) ||
+        f.customer.lastName.toLowerCase().includes(filter) ||
+        f.chrono.toLowerCase().includes(filter)
+    );
+  };
+
   render() {
+    const { loading, invoices, currentPage, itemsPerPage, filter } = this.state;
+
+    const filtered = filter ? this.filter() : invoices;
+
+    const paginated = Pagination.getPaginatedData(
+      filtered,
+      currentPage,
+      itemsPerPage
+    );
+
     return (
       <>
         <h1>Gestion des factures</h1>
+        <div className="my-3">
+          <Search onSearchChanged={this.handleSearch} />
+        </div>
         <table className="table table-hover">
           <thead>
             <tr>
@@ -54,11 +94,24 @@ class Factures extends Component {
             </tr>
           </thead>
           <tbody>
-            {this.state.factures.map(f => (
-              <FactureRow facture={f} key={f.id} />
-            ))}
+            {loading && (
+              <tr>
+                <td>Chargement ...</td>
+              </tr>
+            )}
+            {!loading &&
+              paginated.map(f => <FactureRow facture={f} key={f.id} />)}
           </tbody>
         </table>
+
+        {filtered.length > itemsPerPage && (
+          <Pagination
+            currentPage={currentPage}
+            itemsPerPage={itemsPerPage}
+            itemsCount={filtered.length}
+            onPageChanged={this.handlePaginationChange}
+          />
+        )}
       </>
     );
   }
