@@ -81,6 +81,12 @@ class Customer
     private $invoices;
 
     /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="customers")
+     * @Groups({"customer_read"})
+     */
+    private $user;
+
+    /**
      * @Groups({"customer_read"})
      *
      * @return string
@@ -255,6 +261,18 @@ class Customer
                 $invoice->setCustomer(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }
