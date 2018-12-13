@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 import ClientDisplay from "../components/ClientDisplay";
 
 import format from "./../services/formatter";
@@ -7,6 +8,7 @@ import facturesService from "../services/facturesService";
 import Pagination from "./../components/Pagination";
 import Search from "../components/Search";
 import configuration from "./../config";
+import TableContentLoader from "./../components/loaders/TableContentLoader";
 
 const FactureRow = ({ facture }) => {
   return (
@@ -36,12 +38,19 @@ class Factures extends Component {
     currentPage: 1,
     itemsPerPage: 5,
     filter: "",
-    loading: false
+    loading: true
   };
 
   async componentDidMount() {
-    const invoices = await facturesService.all();
     const itemsPerPage = configuration.itemsPerPage;
+    let invoices = [];
+    try {
+      invoices = await facturesService.all();
+    } catch (error) {
+      toast.error(
+        `Nous n'arrivons pas à récupérer les factures, réessayez plus tard !`
+      );
+    }
     this.setState({ invoices, loading: false, itemsPerPage });
   }
 
@@ -94,15 +103,21 @@ class Factures extends Component {
             </tr>
           </thead>
           <tbody>
-            {loading && (
-              <tr>
-                <td>Chargement ...</td>
-              </tr>
-            )}
             {!loading &&
               paginated.map(f => <FactureRow facture={f} key={f.id} />)}
+            {!loading && paginated.length === 0 && (
+              <tr>
+                <td>
+                  <p>Pas encore de factures</p>
+                  <Link to="/factures/new" className="btn btn-primary">
+                    Créer ma première facture !
+                  </Link>
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
+        {loading && <TableContentLoader />}
 
         {filtered.length > itemsPerPage && (
           <Pagination
@@ -112,6 +127,10 @@ class Factures extends Component {
             onPageChanged={this.handlePaginationChange}
           />
         )}
+
+        <Link className="btn btn-primary" to="/factures/new">
+          Créer une facture
+        </Link>
       </>
     );
   }

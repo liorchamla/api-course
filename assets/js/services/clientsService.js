@@ -1,24 +1,29 @@
 import http from "./http";
-import cache from "./cache";
-import { toast } from "react-toastify";
 
-export const getClients = async () => {
-  try {
-    return await cache.getItem("customers");
-  } catch (error) {
-    try {
-      const { data: customers } = await http.get("/api/customers");
-      cache.setItem("customers", customers);
-      return customers;
-    } catch (httpError) {
-      toast.error(
-        "Nous n'arrivons pas à charger les clients pour l'instant, merci de réessayer plus tard !"
-      );
-      return [];
-    }
-  }
+export const getClient = id => {
+  return http.get("/api/customers/" + id);
+};
+
+export const getClients = () => {
+  return http.get("/api/customers");
+};
+
+export const createClient = customer => {
+  return http.post("/api/customers", customer);
+};
+
+export const updateClient = customer => {
+  return http.put("/api/customers/" + customer.id, customer);
+};
+
+export const deleteClient = id => {
+  return http.delete("/api/customers/" + id);
 };
 
 export default {
-  all: getClients
+  all: getClients,
+  find: getClient,
+  create: createClient,
+  edit: updateClient,
+  delete: deleteClient
 };

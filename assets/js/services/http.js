@@ -2,8 +2,12 @@ import Axios from "axios";
 
 Axios.defaults.headers["Accept"] = "application/json";
 
+const get = url => {
+  return Axios.get(url).then(response => response.data);
+};
+
 export default {
-  get: Axios.get,
+  get,
   post: Axios.post,
   put: Axios.put,
   delete: Axios.delete

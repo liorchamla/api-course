@@ -9,13 +9,12 @@ class HttpCache {
   }
 
   getItem(name) {
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       const item =
         this.cache[name] &&
         this.cache[name].cachedAt + 60000 > new Date().getTime() &&
         this.cache[name].item;
-      if (item) resolve(item);
-      else reject(`The '${name}' item does not exist !`);
+      resolve(item || null);
     });
   }
 }

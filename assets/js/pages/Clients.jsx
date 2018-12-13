@@ -1,15 +1,16 @@
 import React, { Component } from "react";
-
+import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import ClientDisplay from "../components/ClientDisplay";
 import clientsService from "../services/clientsService";
 import Pagination from "../components/Pagination";
 import Search from "../components/Search";
 import Config from "../config";
+import TableContentLoader from "../components/loaders/TableContentLoader";
 
 const formatAmount = amount => `${amount.toLocaleString("ft-FR")} €`;
 
-const ClientRow = ({ client }) => {
+const ClientRow = ({ client, onDelete }) => {
   const globalInvoiced = formatAmount(client.totalInvoiced.global);
   const unpaidInvoices = formatAmount(
     client.totalInvoiced.global -
@@ -30,9 +31,12 @@ const ClientRow = ({ client }) => {
         <Link className="btn btn-primary btn-sm" to={`/clients/${client.id}`}>
           Modifier
         </Link>
-        <Link className="btn btn-danger btn-sm" to={`/clients/${client.id}`}>
+        <button
+          className="btn btn-danger btn-sm"
+          onClick={() => onDelete(client)}
+        >
           Supprimer
-        </Link>
+        </button>
       </td>
     </tr>
   );
@@ -48,7 +52,14 @@ class Clients extends Component {
   };
 
   async componentDidMount() {
-    const customers = await clientsService.all();
+    let customers = [];
+    try {
+      customers = await clientsService.all();
+    } catch (error) {
+      toast.error(
+        `Nous n'arrivons pas à récupérer les clients, veuillez réessayer plus tard !`
+      );
+    }
     this.setState({
       customers,
       loading: false,
@@ -63,6 +74,30 @@ class Clients extends Component {
   handleFilter = ({ currentTarget: input }) => {
     const filter = input.value.toLowerCase();
     this.setState({ currentPage: 1, filter });
+  };
+
+  handleDelete = async client => {
+    const customers = [...this.state.customers];
+    const originalCustomers = [...customers];
+    const index = customers.findIndex(c => c.id === client.id);
+
+    customers.splice(index, 1);
+
+    this.setState({ customers });
+
+    try {
+      await clientsService.delete(client.id);
+      toast.success(
+        `Le client ${client.firstName} ${client.lastName} a bien été supprimé`
+      );
+    } catch (error) {
+      toast.error(
+        `Le client ${client.firstName} ${
+          client.lastName
+        } n'a pas pu être supprimé, réessayez plus tard !`
+      );
+      this.setState({ customers: originalCustomers });
+    }
   };
 
   filter = () => {
@@ -110,26 +145,22 @@ class Clients extends Component {
             </tr>
           </thead>
           <tbody>
-            {loading && (
-              <tr>
-                <td>Chargement ...</td>
-              </tr>
-            )}
             {!loading &&
               paginatedData.length > 0 &&
-              paginatedData.map(c => <ClientRow client={c} key={c.id} />)}
+              paginatedData.map(c => (
+                <ClientRow client={c} key={c.id} onDelete={this.handleDelete} />
+              ))}
             {!loading && paginatedData.length === 0 && (
               <tr>
                 <td>
                   <p>Pas encore de clients</p>
-                  <Link to="/clients/new" className="btn btn-primary">
-                    Créer mon premier client !
-                  </Link>
                 </td>
               </tr>
             )}
           </tbody>
         </table>
+
+        {loading && <TableContentLoader />}
 
         {filteredData.length > itemsPerPage && (
           <Pagination
@@ -139,6 +170,10 @@ class Clients extends Component {
             onPageChanged={this.handlePagination}
           />
         )}
+
+        <Link className="btn btn-primary" to="/clients/new">
+          Créer un nouveau client
+        </Link>
       </>
     );
   }
