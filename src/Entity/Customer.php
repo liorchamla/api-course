@@ -22,13 +22,13 @@ class Customer
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"customer_read", "invoice_read"})
+     * @Groups({"customer_read", "invoice_read", "user_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"customer_read", "invoice_read"})
+     * @Groups({"customer_read", "invoice_read", "user_read"})
      * @Assert\NotBlank(message="First name is mandatory !")
      * @Assert\Length(min=3, max=255, minMessage="First name must have at least 3 characters", maxMessage="First name can not be more than 255 characters long")
      */
@@ -36,7 +36,7 @@ class Customer
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"customer_read", "invoice_read"})
+     * @Groups({"customer_read", "invoice_read", "user_read"})
      * @Assert\NotBlank(message="Last name is mandatory !")
      * @Assert\Length(min=3, max=255, minMessage="Last name must have at least 3 characters", maxMessage="First name can not be more than 255 characters long")
      */
@@ -97,7 +97,7 @@ class Customer
     }
 
     /**
-     * @Groups({"customer_read"})
+     * @Groups({"customer_read", "user_read"})
      *
      * @return array
      */
@@ -114,7 +114,7 @@ class Customer
     }
 
     /**
-     * @Groups({"customer_read"})
+     * @Groups({"customer_read", "user_read"})
      *
      * @return integer
      */

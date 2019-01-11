@@ -2,13 +2,24 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
+ * @ApiResource(
+ *  normalizationContext={"groups"={"user_read"}}
+ * )
+ * @UniqueEntity(
+ *  fields={"email"},
+ *  message="Un utilisateur possédant cet email existe déjà !"
+ * )
  */
 class User implements UserInterface
 {
@@ -16,39 +27,103 @@ class User implements UserInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"user_read", "customer_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
+     * @Groups({"user_read", "customer_read"})
+     * @Assert\NotBlank(message="L'adresse email est obligatoire !")
+     * @Assert\Email(message="Vous devez fournir une adresse email valide !")
      */
     private $email;
 
     /**
      * @ORM\Column(type="json")
+     * @Groups({"user_read"})
      */
     private $roles = [];
 
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
+     * @Assert\NotBlank(message="Le mot de passe est obligatoire !")
+     * @Assert\Length(min=8, minMessage="Le mot de passe doit contenir 8 caractères minimum !")
      */
     private $password;
 
     /**
+     * @var string Password Confirmation
+     * @Assert\NotBlank(message="Vous devez confirmer votre mot de passe !")
+     * @Assert\EqualTo(propertyPath="password", message="Les mots de passe ne coincident pas !")
+     */
+    public $passwordConfirmation;
+
+    /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"user_read", "customer_read"})
+     * @Assert\NotBlank(message="Le prénom est obligatoire !")
      */
     private $firstName;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"user_read", "customer_read"})
+     * @Assert\NotBlank(message="Le nom de famille est obligatoire !")
      */
     private $lastName;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Customer", mappedBy="user")
+     * @Groups({"user_read"})
      */
     private $customers;
+
+    /**
+     * @Groups({"user_read"})
+     *
+     * @return int
+     */
+    public function getCustomersCount()
+    {
+        return count($this->customers);
+    }
+
+    /**
+     * @Groups({"user_read"})
+     *
+     * @return int
+     */
+    public function getInvoicesCount()
+    {
+        $total = 0;
+
+        foreach ($this->customers as $customer) {
+            $total += count($customer->getInvoices());
+        }
+
+        return $total;
+    }
+
+    /**
+     * @Groups({"user_read"})
+     *
+     * @return array
+     */
+    public function getTotalInvoiced(): array
+    {
+        $totals = [Invoice::STATUS_CANCELED => 0, Invoice::STATUS_SENT => 0, Invoice::STATUS_PAID => 0, 'global' => 0];
+
+        foreach ($this->customers as $customer) {
+            foreach ($customer->getInvoices() as $invoice) {
+                $totals[$invoice->getStatus()] += $invoice->getAmount();
+                $totals['global'] += $invoice->getAmount();
+            }
+        }
+
+        return $totals;
+    }
 
     public function __construct()
     {

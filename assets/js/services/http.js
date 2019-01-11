@@ -1,14 +1,26 @@
-import Axios from "axios";
+import axios from "axios";
+import auth from "./auth";
 
-Axios.defaults.headers["Accept"] = "application/json";
+axios.defaults.headers["Accept"] = "application/json";
+axios.defaults.headers["Authorization"] = "Bearer " + auth.getToken();
+axios.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response.status === 401) {
+      auth.logout();
+      return error;
+    }
+    throw error;
+  }
+);
 
 const get = url => {
-  return Axios.get(url).then(response => response.data);
+  return axios.get(url).then(response => response.data);
 };
 
 export default {
   get,
-  post: Axios.post,
-  put: Axios.put,
-  delete: Axios.delete
+  post: axios.post,
+  put: axios.put,
+  delete: axios.delete
 };

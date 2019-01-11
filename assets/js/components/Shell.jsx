@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Switch, Route, HashRouter } from "react-router-dom";
+import { Switch, Route, HashRouter, withRouter } from "react-router-dom";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -10,20 +10,27 @@ import Clients from "./../pages/Clients";
 import Factures from "./../pages/Factures";
 import ClientForm from "./../pages/ClientForm";
 import FactureForm from "./../pages/FactureForm";
+import LoginForm from "./../pages/LoginForm";
+import PrivateRoute from "./route/PrivateRoute";
+import RegisterForm from "../pages/RegisterForm";
 
 class Shell extends Component {
   render() {
+    const WithRouterNavbar = withRouter(Navbar);
+
     return (
       <HashRouter>
         <>
-          <Navbar />
+          <WithRouterNavbar />
           <main className="container pt-5">
             <ToastContainer />
             <Switch>
-              <Route path="/clients/:id" component={ClientForm} />
-              <Route path="/clients" component={Clients} />
-              <Route path="/factures/:id" component={FactureForm} />
-              <Route path="/factures" component={Factures} />
+              <PrivateRoute path="/clients/:id" component={ClientForm} />
+              <PrivateRoute path="/clients" component={Clients} />
+              <PrivateRoute path="/factures/:id" component={FactureForm} />
+              <PrivateRoute path="/factures" component={Factures} />
+              <Route path="/login" component={LoginForm} />
+              <Route path="/register" component={RegisterForm} />
               <Route path="/" component={Home} />
             </Switch>
           </main>

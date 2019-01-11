@@ -1,6 +1,4 @@
 import http from "./http";
-import cache from "./cache";
-import { toast } from "react-toastify";
 
 export const getFactures = () => {
   return http.get("/api/invoices");

@@ -1,4 +1,34 @@
-import React, { Component } from "react";
+import React from "react";
+
+const createPages = (currentPage, pagesCount) => {
+  let last = pagesCount,
+    delta = 2,
+    left = currentPage - delta,
+    right = currentPage + delta + 1,
+    range = [],
+    pages = [],
+    l;
+
+  for (let i = 1; i <= last; i++) {
+    if (i == 1 || i == last || (i >= left && i < right)) {
+      range.push(i);
+    }
+  }
+
+  for (let i of range) {
+    if (l) {
+      if (i - l === 2) {
+        pages.push(l + 1);
+      } else if (i - l !== 1) {
+        pages.push("...");
+      }
+    }
+    pages.push(i);
+    l = i;
+  }
+
+  return pages;
+};
 
 const Pagination = ({
   currentPage,
@@ -8,9 +38,7 @@ const Pagination = ({
 }) => {
   const pagesCount = Math.ceil(itemsCount / itemsPerPage);
 
-  const pages = Array(pagesCount)
-    .fill("x")
-    .map((x, i) => i + 1);
+  const pages = createPages(currentPage, pagesCount);
 
   return (
     <div>
@@ -24,16 +52,28 @@ const Pagination = ({
           </button>
         </li>
 
-        {pages.map(page => (
-          <li
-            key={page}
-            className={"page-item " + (currentPage === page ? "active" : "")}
-          >
-            <button className="page-link" onClick={() => onPageChanged(page)}>
-              {page}
-            </button>
-          </li>
-        ))}
+        {pages.map(
+          page =>
+            (!isNaN(page) && (
+              <li
+                key={page}
+                className={
+                  "page-item " + (currentPage === page ? "active" : "")
+                }
+              >
+                <button
+                  className="page-link"
+                  onClick={() => onPageChanged(page)}
+                >
+                  {page}
+                </button>
+              </li>
+            )) || (
+              <li key={Math.random()} className="page-item disabled">
+                <button className="page-link">...</button>
+              </li>
+            )
+        )}
 
         <li
           className={

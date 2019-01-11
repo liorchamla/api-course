@@ -1,4 +1,5 @@
 import http from "./http";
+import auth from "./auth";
 
 export const getClient = id => {
   return http.get("/api/customers/" + id);
