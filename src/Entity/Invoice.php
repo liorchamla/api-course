@@ -88,7 +88,7 @@ class Invoice
         $this->updatedAt = $this->updatedAt ?? new \DateTime();
 
         $repository = $event->getObjectManager()->getRepository(Invoice::class);
-        $chronoNumber = $repository->findLastChronoNumber();
+        $chronoNumber = $repository->findLastChronoNumber($this->customer->getUser());
         $this->chrono = Invoice::CHRONO_PREFIX . (new \DateTime())->format('Y') . str_pad($chronoNumber, 3, '0', STR_PAD_LEFT);
     }
 

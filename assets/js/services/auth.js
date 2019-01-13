@@ -1,7 +1,6 @@
 import axios from "axios";
 import { toast } from "react-toastify";
-
-let user = null;
+import jwtDecode from "jwt-decode";
 
 const retrieveToken = () => {
   return window.localStorage.getItem("authToken") || null;
@@ -14,6 +13,14 @@ const saveToken = token => {
 const logout = () => {
   window.localStorage.removeItem("authToken");
   axios.defaults.headers["Authorization"] = "";
+};
+
+const getUser = () => {
+  const token = retrieveToken();
+
+  if (token) return jwtDecode(token).data;
+
+  return null;
 };
 
 const authenticate = user => {
@@ -34,13 +41,24 @@ const authenticate = user => {
     });
 };
 
+const isTokenExpired = token => {
+  const data = jwtDecode(token);
+
+  return new Date().getTime() / 1000 - data.exp > 0;
+};
+
 const isAuthenticated = () => {
-  return retrieveToken() !== null;
+  const token = retrieveToken();
+
+  if (!token) return false;
+
+  return !isTokenExpired(token);
 };
 
 export default {
   authenticate,
   isAuthenticated,
   logout,
-  getToken: retrieveToken
+  getToken: retrieveToken,
+  getUser
 };

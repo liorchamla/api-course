@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 
+import jwtDecode from "jwt-decode";
 import auth from "../services/auth";
 import { NavLink } from "react-router-dom";
 
@@ -69,15 +70,22 @@ class Navbar extends Component {
               </>
             )}
             {auth.isAuthenticated() && (
-              <li className="nav-item">
-                <a
-                  style={{ cursor: "pointer" }}
-                  className="nav-link"
-                  onClick={this.handleLogout}
-                >
-                  Déconnexion
-                </a>
-              </li>
+              <>
+                <li className="nav-item">
+                  <NavLink to="/profile" className="nav-link">
+                    {auth.getUser().firstName} {auth.getUser().lastName}
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <a
+                    style={{ cursor: "pointer" }}
+                    className="nav-link"
+                    onClick={this.handleLogout}
+                  >
+                    Déconnexion
+                  </a>
+                </li>
+              </>
             )}
           </ul>
         </div>

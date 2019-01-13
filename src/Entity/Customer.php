@@ -13,7 +13,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity(repositoryClass="App\Repository\CustomerRepository")
  * @ORM\HasLifecycleCallbacks
  * @ApiResource(
- *  normalizationContext={"groups"={"customer_read", "invoice_read"}}
+ *  normalizationContext={"groups"={"customer_read", "invoice_read"}},
+ *  denormalizationContext={"groups"={"customer_write"}}
  * )
  */
 class Customer
@@ -22,13 +23,13 @@ class Customer
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"customer_read", "invoice_read", "user_read"})
+     * @Groups({"customer_read", "invoice_read", "user_read", "customer_write"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"customer_read", "invoice_read", "user_read"})
+     * @Groups({"customer_read", "invoice_read", "user_read", "customer_write"})
      * @Assert\NotBlank(message="First name is mandatory !")
      * @Assert\Length(min=3, max=255, minMessage="First name must have at least 3 characters", maxMessage="First name can not be more than 255 characters long")
      */
@@ -36,7 +37,7 @@ class Customer
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"customer_read", "invoice_read", "user_read"})
+     * @Groups({"customer_read", "invoice_read", "user_read", "customer_write"})
      * @Assert\NotBlank(message="Last name is mandatory !")
      * @Assert\Length(min=3, max=255, minMessage="Last name must have at least 3 characters", maxMessage="First name can not be more than 255 characters long")
      */
@@ -44,14 +45,14 @@ class Customer
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"customer_read", "invoice_read"})
+     * @Groups({"customer_read", "invoice_read", "customer_write"})
      * @Assert\Url(message="Avatar must be a valid image URL")
      */
     private $avatar;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"customer_read"})
+     * @Groups({"customer_read", "customer_write"})
      * @Assert\NotBlank(message="Email is mandatory")
      * @Assert\Email(message="Email must be a valid email address")
      */
@@ -59,7 +60,7 @@ class Customer
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"customer_read"})
+     * @Groups({"customer_read", "customer_write"})
      */
     private $company;
 

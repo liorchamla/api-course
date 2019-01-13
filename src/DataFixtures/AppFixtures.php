@@ -28,6 +28,8 @@ class AppFixtures extends Fixture
     {
         $faker = Factory::create('fr_FR');
 
+        $users = [];
+
         for ($u = 0; $u < 45; $u++) {
             $user = new User();
             $user->setFirstName($faker->firstName())
@@ -36,6 +38,13 @@ class AppFixtures extends Fixture
                 ->setPassword($this->encoder->encodePassword($user, 'password'));
 
             $manager->persist($user);
+
+            $users[] = $user;
+        }
+
+        $manager->flush();
+
+        foreach ($users as $user) {
 
             for ($i = 0; $i < mt_rand(2, 20); $i++) {
                 $gender = $faker->randomElement(['male', 'female']);

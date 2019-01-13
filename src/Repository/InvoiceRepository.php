@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Invoice;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Security\Core\Security;
 
 /**
  * @method Invoice|null find($id, $lockMode = null, $lockVersion = null)
@@ -14,16 +15,23 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class InvoiceRepository extends ServiceEntityRepository
 {
-    public function __construct(RegistryInterface $registry)
+    private $user;
+
+    public function __construct(RegistryInterface $registry, Security $security)
     {
         parent::__construct($registry, Invoice::class);
+
+        $this->user = $security->getUser();
     }
 
-    public function findLastChronoNumber(): int
+    public function findLastChronoNumber($user = null): int
     {
         $data = $this->createQueryBuilder('i')
             ->select('i.chrono')
             ->orderBy('i.chrono', 'DESC')
+            ->join('i.customer', 'c')
+            ->andWhere('c.user = :user')
+            ->setParameter(':user', $user ?? $this->user)
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
